@@ -141,3 +141,75 @@ int NodoAVL<T>::tam() {
     }
     return tamActual;
 }
+
+//Metodos de balanceo
+template <class T>
+int NodoAVL<T>::factorBalance() {
+    //Devuelve el factor balance del nodo actual
+    int alturaIzq = getHijoIzq() ? getHijoIzq()->altura() : -1;
+    int alturaDer = getHijoDer() ? getHijoDer()->altura() : -1;
+    return alturaIzq - alturaDer;
+}
+
+
+template <class T>
+NodoAVL<T>* NodoAVL<T>::balancearNodo() {
+    int factorBalance = this->factorBalance();
+
+    // Si el balance es mayor que 1, el subárbol izquierdo está desbalanceado
+    if (factorBalance > 1) {
+        if (this->getHijoIzq()->factorBalance() >= 0) {
+            // Rotación simple a la derecha
+            return this->rotacionDerecha();
+        } else {
+            // Rotación doble: primero rotación izquierda en el hijo izquierdo, luego derecha
+            this->setHijoIzq(this->getHijoIzq()->rotacionIzquierda());
+            return this->rotacionDerecha();
+        }
+    }
+    // Si el balance es menor que -1, el subárbol derecho está desbalanceado
+    else if (factorBalance < -1) {
+        if (this->getHijoDer()->factorBalance() <= 0) {
+            // Rotación simple a la izquierda
+            return this->rotacionIzquierda();
+        } else {
+            // Rotación doble: primero rotación derecha en el hijo derecho, luego izquierda
+            this->setHijoDer(this->getHijoDer()->rotacionDerecha());
+            return this->rotacionIzquierda();
+        }
+    }
+
+    // Si el nodo está balanceado, devolver el nodo sin cambios
+    return this;
+}
+
+
+
+//Rotaciones
+template <class T>
+NodoAVL<T>* NodoAVL<T>:: rotacionDerecha() {
+    NodoAVL<T>* nuevoNodo = this->getHijoIzq();
+    this->setHijoIzq(nuevoNodo->getHijoDer());
+    nuevoNodo->setHijoDer(this);
+    return nuevoNodo;
+}
+
+template <class T>
+NodoAVL<T>* NodoAVL<T>:: rotacionIzquierda() {
+    NodoAVL<T>* nuevoNodo = this->getHijoDer();  
+    this->setHijoDer(nuevoNodo->getHijoIzq());
+    nuevoNodo->setHijoIzq(this);
+    return nuevoNodo;
+}
+
+template <class T>
+NodoAVL<T>* NodoAVL<T>:: rotacionIzquierdaDerecha() {
+    this->setHijoIzq(rotacionIzquierda(this->getHijoIzq()));
+    return rotacionDerecha(this);
+}
+
+template <class T>
+NodoAVL<T>* NodoAVL<T>:: rotacionDerechaIzquierda() {
+    this->setHijoDer(rotacionDerecha(this->getHijoDer()));
+    return rotacionIzquierda(this);
+}

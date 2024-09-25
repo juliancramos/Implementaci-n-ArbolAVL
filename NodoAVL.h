@@ -3,6 +3,10 @@
 
 #include <string>
 
+// Declaración anticipada de ArbolAVL
+template <class T>
+class ArbolAVL; 
+
 template <class T>
 class NodoAVL{
     protected:
@@ -19,8 +23,6 @@ class NodoAVL{
         bool esHoja();
         void setDato(T& datoNuevo);
         int altura();
-
-
         void setHijoIzq(NodoAVL<T>* izq);
         void setHijoDer(NodoAVL<T>* der);
                  
@@ -30,7 +32,15 @@ class NodoAVL{
         void inOrden();
         void nivelOrden();
         int tam();
+        //Metodos de balanceo
+        int factorBalance();
+        // void balancear( ArbolAVL<T>* arbol);
+        NodoAVL<T>* balancearNodo();
 
+        NodoAVL<T>* rotacionDerecha();
+        NodoAVL<T>* rotacionIzquierda();
+        NodoAVL<T>* rotacionDerechaIzquierda();
+        NodoAVL<T>* rotacionIzquierdaDerecha();
         
 };
 

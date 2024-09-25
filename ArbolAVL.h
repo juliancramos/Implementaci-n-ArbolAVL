@@ -21,6 +21,15 @@ public:
     void inOrden();
     void posOrden();
     void nivelOrden();
+
+    void balancearArbol(); //Verifica cada nodo para saber si está balanceado
+
+    
+
+    NodoAVL<T>* insertarNodo(NodoAVL<T>* nodo, T valorDato, bool& insertado);
+    
+
+    
 };
 
 #include "ArbolAVL.hxx"

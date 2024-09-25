@@ -29,29 +29,129 @@ T ArbolAVL<T>::datoRaiz() {
 
 template <class T>
 int ArbolAVL<T>::altura() {
-    if(esVacio()){
+    if (esVacio()) {
         return -1;
-    }
-    if(raiz->esHoja()){
-        return 0;
     }
     return raiz->altura();
 }
 
 template <class T>
 int ArbolAVL<T>::tamano() {
-    return raiz->tam();
+    if(raiz!=nullptr){
+        return raiz->tam();
+    }
+    return -1;
 }
+
+
 
 template <class T>
 bool ArbolAVL<T>::insertar(T valorDato) {
-    return false //Sin implementar
+    bool insertado = false;
+    raiz = insertarNodo(raiz, valorDato, insertado);
+    balancearArbol();  // Balancear después de la inserción
+    return insertado;
 }
 
 template <class T>
-bool ArbolAVL<T>::eliminar(T valorDato) {
-    return false //sin implementar
+NodoAVL<T>* ArbolAVL<T>::insertarNodo(NodoAVL<T>* nodo, T valorDato, bool& insertado) {
+    if (nodo == nullptr) {
+        NodoAVL<T>* nuevoNodo = new NodoAVL<T>();
+        nuevoNodo->setDato(valorDato);
+        insertado = true;
+        return nuevoNodo;
+    }
+
+    if (valorDato < nodo->getDato()) {
+        nodo->setHijoIzq(insertarNodo(nodo->getHijoIzq(), valorDato, insertado));
+    } else if (valorDato > nodo->getDato()) {
+        nodo->setHijoDer(insertarNodo(nodo->getHijoDer(), valorDato, insertado));
+    } else {
+        insertado = false;  // Valor duplicado
+        return nodo;
+    }
+
+    return nodo->balancearNodo();
 }
+
+
+
+
+
+template <class T>
+bool ArbolAVL<T>::eliminar(T valorDato) {
+    NodoAVL<T>* nodo = raiz;
+    NodoAVL<T>* nodoPadre = nullptr;
+
+    // Busca el nodo a eliminar
+    while (nodo != nullptr && nodo->getDato() != valorDato) {
+        nodoPadre = nodo;
+        if (valorDato < nodo->getDato()) {
+            nodo = nodo->getHijoIzq();
+        } else {
+            nodo = nodo->getHijoDer();
+        }
+    }
+
+    // Nodo no encontrado
+    if (nodo == nullptr) {
+        return false;
+    }
+
+    // Caso 1: Nodo hoja
+    if (nodo->esHoja()) {
+        if (nodo == raiz) {
+            delete raiz;
+            raiz = nullptr;
+        } else if (nodo == nodoPadre->getHijoIzq()) {
+            nodoPadre->setHijoIzq(nullptr);
+        } else {
+            nodoPadre->setHijoDer(nullptr);
+        }
+        delete nodo;
+    }
+    // Caso 2: Nodo con un solo hijo
+    else if (nodo->getHijoIzq() == nullptr || nodo->getHijoDer() == nullptr) {
+        NodoAVL<T>* hijo = (nodo->getHijoIzq() != nullptr) ? nodo->getHijoIzq() : nodo->getHijoDer();
+    
+        if (nodo == raiz) {
+            raiz = hijo; // Si se está eliminando la raíz
+        } else if (nodoPadre->getHijoIzq() == nodo) {
+            nodoPadre->setHijoIzq(hijo);
+        } else {
+            nodoPadre->setHijoDer(hijo);
+        }
+        delete nodo; 
+    }
+    // Caso 3: Nodo con dos hijos
+    else {
+        NodoAVL<T>* sucesor = nodo->getHijoDer();
+        NodoAVL<T>* padreSucesor = nodo;
+
+        while (sucesor->getHijoIzq() != nullptr) {
+            padreSucesor = sucesor;
+            sucesor = sucesor->getHijoIzq();
+        }
+
+        nodo->setDato(sucesor->getDato()); // Reemplaza el dato del nodo a eliminar
+
+        // Eliminar el sucesor
+        if (padreSucesor->getHijoIzq() == sucesor) {
+            padreSucesor->setHijoIzq(sucesor->getHijoDer());
+        } else {
+            padreSucesor->setHijoDer(sucesor->getHijoDer());
+        }
+        delete sucesor;
+    }
+
+    // Balancear el árbol desde el nodo padre
+    if (nodoPadre != nullptr) {
+        nodoPadre->balancearNodo();
+    }
+    balancearArbol();
+    return true;
+}
+
 
 template <class T>
 bool ArbolAVL<T>::buscar(T valorDato) {
@@ -81,17 +181,32 @@ void ArbolAVL<T>::preOrden() {
 template <class T>
 void ArbolAVL<T>::posOrden() {
     // Primero hijos, luego padre
-    raiz->posOrden();
+    if(raiz!=nullptr){
+        raiz->posOrden();
+    }
 }
 
 template <class T>
 void ArbolAVL<T>::inOrden() {
     // Hijo izquierdo, luego padre, luego hijo derecho
-    raiz->inOrden();
+    if(raiz!=nullptr){
+        raiz->inOrden();
+    }
 }
 
 template <class T>
 void ArbolAVL<T>::nivelOrden() {
     // Por niveles, de izquierda a derecha
-    raiz->nivelOrden();
+    if(raiz!=nullptr){
+        raiz->nivelOrden(); 
+    }
+    
+}
+
+//Metodos de balanceo
+template <class T>
+void ArbolAVL<T>::balancearArbol() {
+    if (raiz != nullptr) {
+        raiz->balancearNodo();
+    }
 }
